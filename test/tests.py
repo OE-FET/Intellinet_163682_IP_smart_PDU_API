@@ -1,13 +1,8 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*- 
+# -*- coding: utf-8 -*-
 import unittest
 
-# twist import paths so this file can be executed from within my editor in a standard fashion
-# for more details see: https://stackoverflow.com/questions/11536764/how-to-fix-attempted-relative-import-in-non-package-even-with-init-py
-if __name__ == '__main__' and __package__ is None:
-    from os import sys, path
-    sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-from api import IPU
+from intellinet_pdu import IPU
 from config import HOST
 
 
@@ -25,14 +20,14 @@ class TestAgainstLiveInstance(unittest.TestCase):
 
     def test_status(self):
         self.assertEqual(
-            set(self.api.status().keys()), 
+            set(self.api.status().keys()),
             set(['outlet_states', 'degree_celcius', 'current_amperes', 'humidity_percent', 'stat'])
         )
 
     def test_outlet_names(self):
-        o_names = [('outlet0', 'PACS'), ('outlet1', 'Steckdose2'), 
-        ('outlet2', 'Steckdose3'), ('outlet3', 'Steckdose4'), 
-        ('outlet4', 'GINA'), ('outlet5', 'GINA Router'), 
+        o_names = [('outlet0', 'PACS'), ('outlet1', 'Steckdose2'),
+        ('outlet2', 'Steckdose3'), ('outlet3', 'Steckdose4'),
+        ('outlet4', 'GINA'), ('outlet5', 'GINA Router'),
         ('outlet6', 'Steckdose7'), ('outlet7', 'UPC Modem')]
 
         self.assertEqual(self.api.outlet_names(), o_names)
@@ -44,9 +39,9 @@ class TestAgainstLiveInstance(unittest.TestCase):
             self.assertEqual(set(v.keys()), set(['turn_off_delay', 'turn_on_delay', 'name']))
 
     def test_pdu_config_setter(self):
-        push_config = {'outlet1': {'turn_on_delay': 40, 'turn_off_delay': 30, 'name': 'TESTNAME1'}, 
+        push_config = {'outlet1': {'turn_on_delay': 40, 'turn_off_delay': 30, 'name': 'TESTNAME1'},
                        'outlet6': {'turn_on_delay': 20, 'turn_off_delay': 10, 'name': 'TEST NAME2'}}
-        
+
         original_config = self.api.pdu_config()
         new_config = self.api.pdu_config(push_config)
 

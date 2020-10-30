@@ -1,5 +1,4 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*- 
+# -*- coding: utf-8 -*-
 """Summary
 """
 import requests
@@ -13,9 +12,9 @@ from urllib.parse import urljoin, urlunsplit
 
 """ WARNING - WARNING - WARNING - WARNING - WARNING - WARNING - WARNING
 
-        I STRONGLY DISCOURAGE YOU FROM USING THIS PDU IN PRODUCTION. 
-        IT'S SECURITY IS VIRTUALLY NON EXISTENT AND I FOUND MULTIPLE 
-        EXPLOITABLE VULNERABILITIES JUST WHILE WRITING THIS API WRAPPER 
+        I STRONGLY DISCOURAGE YOU FROM USING THIS PDU IN PRODUCTION.
+        IT'S SECURITY IS VIRTUALLY NON EXISTENT AND I FOUND MULTIPLE
+        EXPLOITABLE VULNERABILITIES JUST WHILE WRITING THIS API WRAPPER
 
     WARNING - WARNING - WARNING - WARNING - WARNING - WARNING - WARNING """
 
@@ -29,19 +28,19 @@ class IPU():
 
     """This class is represents a api wrapper for the Intellinet IP smart PDU API [163682].
         It provides all the functionality of the web interface it is based on.
-    
+
     Class-Attributes:
         DEFAULT_CREDS (:obj:`tuple` of :obj:`str`): default username/password of pdu
         DEFAULT_ENDCODING (str): default encoding of pdu
         DEFAULT_SCHEMA (str): default schema of pdu
     """
-    
+
     DEFAULT_SCHEMA = "http"
     DEFAULT_ENDCODING = "gb2312"
     DEFAULT_CREDS = ("admin", "admin")
 
     def __init__(self, host, auth=None, charset=None, schema=None):
-        """        
+        """
         Args:
             host (str): IP addr of pdu/ipu
             auth (:obj:`tuple` of :obj:`str`, optional): (username, password). Defaults to DEFAULT_CREDS
@@ -77,11 +76,11 @@ class IPU():
 
     def _get_request(self, page, params=None):
         """Internal wrapper around requests get method and the pdus available endpoints.
-        
+
         Args:
             page (str): endpoint / page that is requested
             params (dict, optional): get parametrs to be send along with request. Used for updating settings.
-        
+
         Returns:
             :obj:`requests.models.Response`: The raw object returned by the requests lib.
         """
@@ -90,7 +89,7 @@ class IPU():
 
     def _post_request(self, page, data):
         """Internal wrapper around requests post method and the pdus available endpoints.
-        
+
         Args:
             page (str): See: self._get_request()
             data (dict): post data
@@ -102,10 +101,10 @@ class IPU():
 
     def _decode_response(self, resp):
         """simple helper to decode requests responses.
-        
+
         Args:
             resp (:obj:`requests.models.Response`): The raw object returned by the requests lib.
-        
+
         Returns:
             str: decoded string that was contained in the response from the api.
         """
@@ -113,10 +112,10 @@ class IPU():
 
     def _parse_resp_content(self, raw_resp_content):
         """simple wrapper around lxml that automatically uses the correct xml/html parser.
-        
+
         Args:
             raw_resp_content (str): the decoded response from the api.
-        
+
         Returns:
             :obj:`lxml.etree._Element`: searchable etree of the response string passed to the function.
         """
@@ -131,11 +130,11 @@ class IPU():
 
     def _api_request(self, page, params=None, data=None):
         """One strop shop helper for api requests. Hightes level wrapper which requests, decodes and parses in one step.
-        
+
         Args:
             page (str): endpoint to be used
             params (dict, optional): optional get parameters to be send along with the request.
-            data (dict, optional): will cause the api call to be performed as HTTP POST request with `data` as payload. 
+            data (dict, optional): will cause the api call to be performed as HTTP POST request with `data` as payload.
                 In this case `params` will be ignored.
         Returns:
             :obj:`lxml.etree._Element`: See: self._parse_resp_content
@@ -149,13 +148,13 @@ class IPU():
 
 
     def _auth(self, creds):
-        """Don't even bother... The PDU only requests a http auth on the / page. 
+        """Don't even bother... The PDU only requests a http auth on the / page.
             All other pages/endpoints (including settings updates und file uploads)
             are unprotected.
-        
+
         Args:
             creds (:obj:`tuple` of :obj:`str`): (username, password).
-        
+
         Returns:
             :obj:`requests.auth.HTTPBasicAuth`: requestes auth class.
         """
@@ -164,11 +163,11 @@ class IPU():
 
     def _extract_value(self, etree, xml_element_name):
         """simple weapper around lxml value extration.
-        
+
         Args:
             etree (:obj:`lxml.etree._Element`): a lxml etree
-            xml_element_name (str): the name of the values coresponding element. 
-        
+            xml_element_name (str): the name of the values coresponding element.
+
         Returns:
             str: the value belonging to `xml_element_name`
         """
@@ -178,10 +177,10 @@ class IPU():
     # public api
 
     def status(self):
-        """gives you basic status/health of the device. 
+        """gives you basic status/health of the device.
             Values: deg. C, outlet states [on/off], status [read: are there warnings?], humidity in perc, amps.
         Returns:
-            dict: containing the aforementioned stats. 
+            dict: containing the aforementioned stats.
                   e.g. {'degree_celcius': '26', 'outlet_states': ['on', 'on', 'off', 'on', 'on', 'on', 'on', 'on'],
                         'stat': 'normal', 'humidity_percent': '27', 'current_amperes': '0.5'}
         """
@@ -196,15 +195,15 @@ class IPU():
         }
 
     def pdu_config(self, outlet_configs=None):
-        """ Getter/setter for outlet configs. 
-            Allows you to name the outlets as well as set turn on/off delays 
+        """ Getter/setter for outlet configs.
+            Allows you to name the outlets as well as set turn on/off delays
             to prevent overloading or create boot/shutdown orders.
-        
+
         Args:
             outlet_configs (dict, optional): if present the pdu config will be updates to fit the given dict. Format:
                 {'outlet1': {'outlet_name': 'outlet3', 'turn_on_delay': 3, 'turn_of_delay': 3},
                 'outlet2': ... }
-        
+
         Returns:
             :obj:`dict` of :obj:`dict` or None: Keys: `turn_on_delay`, `turn_off_delay`, `name`
         """
@@ -215,7 +214,7 @@ class IPU():
 
     def _set_config_pdu(self, outlet_configs):
         """Setter for self.pdu_config()
-        
+
         Args:
             outlet_configs (dict): dict that is formatted like the output of self._get_config_pdu()
         """
@@ -235,11 +234,11 @@ class IPU():
 
     def _get_config_pdu(self):
         """Getter for self.pdu_config()
-        
+
         Returns:
             :obj:`dict` of :obj:`dict`: e.g.
             {
-                'outlet5': {'turn_on_delay': 9, 'turn_off_delay': 9, 'name': 'GINA'}, 
+                'outlet5': {'turn_on_delay': 9, 'turn_off_delay': 9, 'name': 'GINA'},
                 'outlet2': {'turn_on_delay': 6, 'turn_off_delay': 6, 'name': 'Steckdose2'},
                 'outlet7': {'turn_on_delay': 11, 'turn_off_delay': 11, 'name': 'Steckdose7'},
                 'outlet1': {'turn_on_delay': 5, 'turn_off_delay': 5, 'name': 'PACS'},
@@ -276,10 +275,10 @@ class IPU():
 
     def _get_outlet_states(self, list_of_outlet_ids):
         """wrapper around self.status() returns only on/off for the given outlet_ids.
-        
+
         Args:
             list_of_outlet_ids (:obj:`list` of `int`): the ids of the outlets you want see.
-        
+
         Returns:
             :obj:`list` of `str`: e.g. ['on', 'off', 'off', 'off', 'on']
         """
@@ -288,11 +287,11 @@ class IPU():
 
     def _set_outlet_states(self, list_of_outlet_ids, state):
         """A `list_of_outlet_ids` will be set to a given `state`.
-        
+
         Args:
             list_of_outlet_ids (:obj:`list` of `int`): the ids of the outlets you want to change.
             state (str): One of ['on', 'off', 'power_cycle_off_on']
-        
+
         Returns:
             :obj:`lxml.etree._Element`: the api response
         """
@@ -306,10 +305,10 @@ class IPU():
 
     def enable_outlets(self, list_of_outlet_ids):
         """Wrapper around self._set_outlet_states() to enable all given outlets
-        
+
         Args:
             list_of_outlet_ids (:obj:`list` of `int`): See: self._set_outlet_states()
-        
+
         Returns:
             :obj:`lxml.etree._Element`: See: self._set_outlet_states()
         """
@@ -317,10 +316,10 @@ class IPU():
 
     def disable_outlets(self, list_of_outlet_ids):
         """Wrapper around self._set_outlet_states() to disable all given outlets
-        
+
         Args:
             list_of_outlet_ids (:obj:`list` of `int`): See: self._set_outlet_states()
-        
+
         Returns:
             :obj:`lxml.etree._Element`: See: self._set_outlet_states()
         """
@@ -328,10 +327,10 @@ class IPU():
 
     def power_cycle_outlets(self, list_of_outlet_ids):
         """Wrapper around self._set_outlet_states() to perform a power cycle on all given outlets
-        
+
         Args:
             list_of_outlet_ids (:obj:`list` of `int`): See: self._set_outlet_states()
-        
+
         Returns:
             :obj:`lxml.etree._Element`: See: self._set_outlet_states()
         """
@@ -339,7 +338,7 @@ class IPU():
 
     def outlet_names(self):
         """Simply get a list of outlet names
-        
+
         Returns:
             list_of_outlet_ids (:obj:`tuple` of `str`): ('machine_name', 'human_name')
         """
