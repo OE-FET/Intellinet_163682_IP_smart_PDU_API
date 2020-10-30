@@ -1,2 +1,2 @@
 # -*- coding: utf-8 -*-
-from api import IPU
+from .api import IPU
